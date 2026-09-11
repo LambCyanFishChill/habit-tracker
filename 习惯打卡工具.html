@@ -1,0 +1,2531 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f7f5">
+  <meta name="description" content="一个简单、好看的习惯打卡工具。">
+  <title>习惯小站 · 每日打卡</title>
+  <style>
+﻿:root {
+  --bg: #f5f2e9;
+  --surface: #fffdf8;
+  --surface-soft: #f7faf7;
+  --surface-mint: #eaf5ef;
+  --mint: #72a98b;
+  --mint-strong: #3f7d61;
+  --mint-deep: #285c46;
+  --orange: #df9c5b;
+  --orange-soft: #f8e7d5;
+  --ink: #26362f;
+  --muted: #75827c;
+  --line: #dfe6df;
+  --line-strong: #cbd7ce;
+  --done-bg: #edf0ee;
+  --done-line: #d9dedb;
+  --done-text: #949c98;
+  --danger: #b35c54;
+  --shadow: 0 18px 50px rgba(48, 72, 59, 0.09);
+  --shadow-soft: 0 8px 24px rgba(48, 72, 59, 0.07);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --transition: 180ms ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 8% 2%, rgba(223, 156, 91, 0.16), transparent 28rem),
+    radial-gradient(circle at 92% 8%, rgba(114, 169, 139, 0.2), transparent 30rem),
+    linear-gradient(180deg, #f8f5ed 0%, #f3f5ef 100%);
+  font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  color: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+.file-button:focus-within {
+  outline: 3px solid rgba(63, 125, 97, 0.24);
+  outline-offset: 3px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.page-shell {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 28px 0 36px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 16px;
+  color: #fff;
+  background: linear-gradient(145deg, var(--mint), var(--mint-strong));
+  box-shadow: 0 10px 22px rgba(63, 125, 97, 0.22);
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand strong {
+  font-size: 19px;
+  letter-spacing: 0.02em;
+}
+
+.brand small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.backup-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  cursor: pointer;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: transform var(--transition), background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button-primary {
+  color: #fff;
+  background: var(--mint-strong);
+  box-shadow: 0 8px 18px rgba(63, 125, 97, 0.2);
+}
+
+.button-primary:hover {
+  background: var(--mint-deep);
+}
+
+.button-quiet {
+  color: var(--mint-deep);
+  border-color: var(--line);
+  background: rgba(255, 253, 248, 0.78);
+}
+
+.button-quiet:hover {
+  border-color: var(--line-strong);
+  background: #fff;
+}
+
+.button-danger {
+  color: #fff;
+  background: var(--danger);
+}
+
+.button-danger:hover {
+  background: #994942;
+}
+
+.button-small {
+  min-height: 36px;
+  padding: 7px 11px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.file-button {
+  cursor: pointer;
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
+  gap: 36px;
+  align-items: center;
+  min-height: 240px;
+  margin-bottom: 22px;
+  padding: 42px;
+  overflow: hidden;
+  border: 1px solid rgba(114, 169, 139, 0.2);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(120deg, rgba(255, 253, 248, 0.96), rgba(235, 246, 239, 0.92)),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.hero::before,
+.hero::after {
+  position: absolute;
+  border-radius: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.hero::before {
+  width: 220px;
+  height: 220px;
+  top: -120px;
+  right: 18%;
+  background: rgba(223, 156, 91, 0.12);
+}
+
+.hero::after {
+  width: 180px;
+  height: 180px;
+  right: -80px;
+  bottom: -110px;
+  background: rgba(114, 169, 139, 0.16);
+}
+
+.hero-copy,
+.progress-card {
+  position: relative;
+  z-index: 1;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: var(--mint-strong);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 580px;
+  margin: 0;
+  font-size: clamp(30px, 4.5vw, 50px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.today-date {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.progress-card {
+  padding: 24px;
+  border: 1px solid rgba(114, 169, 139, 0.2);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.66);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+}
+
+.progress-copy {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.progress-copy span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.progress-copy strong {
+  color: var(--mint-deep);
+  font-size: 27px;
+  letter-spacing: -0.03em;
+}
+
+.progress-track {
+  height: 11px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dfe8e2;
+}
+
+.progress-track span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--mint), var(--orange));
+  transition: width 360ms ease;
+}
+
+.progress-card p {
+  margin: 13px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(350px, 0.92fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.panel {
+  border: 1px solid rgba(207, 219, 210, 0.9);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 253, 248, 0.92);
+  box-shadow: var(--shadow-soft);
+}
+
+.today-panel,
+.calendar-panel {
+  min-height: 520px;
+  padding: 28px;
+}
+
+.panel-heading,
+.calendar-heading,
+.detail-heading,
+.modal-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.panel-heading h2,
+.calendar-heading h2,
+.detail-heading h2,
+.modal-heading h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.summary-pill {
+  display: inline-flex;
+  min-width: 64px;
+  justify-content: center;
+  padding: 7px 11px;
+  border-radius: 999px;
+  color: var(--mint-deep);
+  background: var(--surface-mint);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.add-habit-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.add-habit-form input,
+.modal-card input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--ink);
+  background: #fff;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.add-habit-form input::placeholder,
+.modal-card input::placeholder {
+  color: #a4aea8;
+}
+
+.add-habit-form input:hover,
+.modal-card input:hover {
+  border-color: var(--line-strong);
+}
+
+.add-habit-form input:focus,
+.modal-card input:focus {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 4px rgba(114, 169, 139, 0.12);
+  outline: none;
+}
+
+.form-message,
+.modal-message {
+  min-height: 21px;
+  margin: 7px 2px 0;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.habit-list,
+.detail-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.habit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 8px 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition), opacity var(--transition);
+}
+
+.habit-row:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-strong);
+}
+
+.habit-toggle {
+  display: flex;
+  min-width: 0;
+  min-height: 48px;
+  align-items: center;
+  gap: 13px;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  background: transparent;
+}
+
+.habit-check {
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 2px solid #bbccc1;
+  border-radius: 10px;
+  color: transparent;
+  background: #fff;
+  font-size: 17px;
+  font-weight: 900;
+  transition: color var(--transition), background var(--transition), border-color var(--transition), transform var(--transition);
+}
+
+.habit-toggle:hover .habit-check {
+  border-color: var(--mint);
+  transform: scale(1.04);
+}
+
+.habit-name {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--transition), text-decoration-color var(--transition);
+}
+
+.habit-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.text-button,
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  cursor: pointer;
+  color: var(--muted);
+  background: transparent;
+  transition: color var(--transition), background var(--transition), transform var(--transition);
+}
+
+.text-button {
+  min-height: 36px;
+  padding: 6px 9px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.text-button:hover {
+  color: var(--mint-deep);
+  background: var(--surface-mint);
+}
+
+.text-button.delete:hover {
+  color: var(--danger);
+  background: #f8ecea;
+}
+
+.habit-row.is-completed {
+  border-color: var(--done-line);
+  background: var(--done-bg);
+}
+
+.habit-row.is-completed .habit-name {
+  color: var(--done-text);
+  text-decoration: line-through;
+  text-decoration-color: #abb2ae;
+  text-decoration-thickness: 1.5px;
+}
+
+.habit-row.is-completed .habit-check {
+  border-color: #899a90;
+  color: #fff;
+  background: #899a90;
+}
+
+.habit-row.is-completed .habit-toggle:hover .habit-check {
+  border-color: #75877d;
+}
+
+.habit-row.is-completed .text-button {
+  color: #929a96;
+}
+
+.detail-panel {
+  margin-top: 22px;
+  padding: 28px;
+}
+
+.detail-heading {
+  align-items: center;
+}
+
+.detail-date {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.detail-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.detail-summary strong {
+  color: var(--mint-deep);
+  font-size: 24px;
+}
+
+.readonly-badge {
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: #8b6b46;
+  background: var(--orange-soft);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.readonly-note {
+  margin: 16px 0 -6px;
+  padding: 10px 13px;
+  border-radius: 12px;
+  color: #80633f;
+  background: #fbf1e5;
+  font-size: 12px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.detail-row-button {
+  width: 100%;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.detail-row-button:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 5px 14px rgba(48, 72, 59, 0.06);
+}
+
+.detail-row.is-completed {
+  border-color: var(--done-line);
+  color: var(--done-text);
+  background: var(--done-bg);
+}
+
+.detail-row.is-completed .detail-name {
+  text-decoration: line-through;
+  text-decoration-color: #abb2ae;
+  text-decoration-thickness: 1.5px;
+}
+
+.detail-check {
+  display: grid;
+  flex: 0 0 25px;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border: 1.5px solid #cad5ce;
+  border-radius: 9px;
+  color: transparent;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.detail-row.is-completed .detail-check {
+  border-color: #899a90;
+  color: #fff;
+  background: #899a90;
+}
+
+.detail-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-state {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.calendar-heading {
+  align-items: center;
+}
+
+.month-navigation {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  gap: 6px;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.month-navigation strong {
+  text-align: center;
+  font-size: 16px;
+}
+
+.icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  font-size: 25px;
+  line-height: 1;
+}
+
+.icon-button:hover {
+  color: var(--mint-deep);
+  background: var(--surface-mint);
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.calendar-weekdays {
+  gap: 5px;
+  margin-top: 15px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.calendar-grid {
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.calendar-day,
+.calendar-blank {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  min-height: 42px;
+}
+
+.calendar-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  cursor: pointer;
+  color: #496056;
+  background: #f7f9f7;
+  transition: transform var(--transition), background var(--transition), border-color var(--transition), color var(--transition), box-shadow var(--transition);
+}
+
+.calendar-day:hover:not(:disabled) {
+  z-index: 1;
+  transform: translateY(-2px);
+  border-color: var(--line-strong);
+  box-shadow: 0 6px 14px rgba(48, 72, 59, 0.08);
+}
+
+.calendar-day .day-number {
+  position: relative;
+  z-index: 1;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.calendar-day.status-none {
+  background: #f7f8f7;
+}
+
+.calendar-day.status-partial {
+  color: #83633f;
+  background: #f7eadb;
+}
+
+.calendar-day.status-all {
+  color: #285c46;
+  background: #dceee4;
+}
+
+.calendar-day.is-today {
+  box-shadow: inset 0 0 0 1px var(--orange);
+}
+
+.calendar-day.is-selected {
+  border-color: var(--mint-deep);
+  box-shadow: inset 0 0 0 1px var(--mint-deep), 0 5px 14px rgba(63, 125, 97, 0.13);
+}
+
+.calendar-day.is-future {
+  cursor: not-allowed;
+  color: #c3c9c5;
+  background: #fafaf8;
+}
+
+.calendar-day.is-future.is-today {
+  color: #496056;
+}
+
+.calendar-day .day-marker {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.62;
+}
+
+.calendar-day.status-none .day-marker,
+.calendar-day.is-future .day-marker {
+  display: none;
+}
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px 14px;
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-none {
+  background: #e3e7e4;
+}
+
+.legend-partial {
+  background: #e7b87f;
+}
+
+.legend-all {
+  background: var(--mint);
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  padding: 48px 22px 30px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.empty-state h3 {
+  margin: 16px 0 5px;
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.empty-state p {
+  max-width: 360px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.empty-illustration {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  width: 70px;
+  height: 48px;
+  justify-content: center;
+}
+
+.empty-illustration span {
+  display: block;
+  width: 15px;
+  border-radius: 8px 8px 4px 4px;
+  background: var(--mint);
+}
+
+.empty-illustration span:nth-child(1) {
+  height: 24px;
+  opacity: 0.45;
+}
+
+.empty-illustration span:nth-child(2) {
+  height: 39px;
+  background: var(--orange);
+}
+
+.empty-illustration span:nth-child(3) {
+  height: 31px;
+  opacity: 0.72;
+}
+
+.empty-state-compact {
+  padding: 28px 20px 12px;
+}
+
+.empty-state-compact h3 {
+  margin-top: 0;
+}
+
+.page-footer {
+  padding: 20px 4px 0;
+  color: #8a948f;
+  font-size: 12px;
+  text-align: center;
+}
+
+.page-footer p {
+  margin: 0;
+}
+
+.modal {
+  width: min(460px, calc(100% - 28px));
+  padding: 0;
+  border: 0;
+  border-radius: 22px;
+  color: var(--ink);
+  background: transparent;
+  box-shadow: 0 28px 80px rgba(31, 48, 39, 0.26);
+}
+
+.modal::backdrop {
+  background: rgba(32, 47, 39, 0.38);
+  backdrop-filter: blur(3px);
+}
+
+.modal-card {
+  display: grid;
+  gap: 14px;
+  padding: 25px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--surface);
+}
+
+.modal-heading h2 {
+  font-size: 20px;
+}
+
+.modal-card label {
+  margin-bottom: -7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 4px;
+}
+
+.confirm-message {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.toast {
+  position: fixed;
+  z-index: 50;
+  left: 50%;
+  bottom: 24px;
+  max-width: min(420px, calc(100% - 32px));
+  padding: 11px 16px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  color: #fff;
+  background: rgba(38, 54, 47, 0.94);
+  box-shadow: 0 12px 32px rgba(31, 48, 39, 0.2);
+  font-size: 13px;
+  text-align: center;
+}
+
+.toast.is-error {
+  background: rgba(157, 73, 66, 0.96);
+}
+
+/* Monochrome editorial theme inspired by the supplied reference image. */
+:root {
+  --bg: #f6f7f6;
+  --surface: #ffffff;
+  --surface-soft: #fafafa;
+  --surface-mint: #f3f4f3;
+  --mint: #777b7b;
+  --mint-strong: #343637;
+  --mint-deep: #222425;
+  --orange: #858989;
+  --orange-soft: #f1f2f1;
+  --ink: #222425;
+  --muted: #7b7e7f;
+  --line: #e8e9e8;
+  --line-strong: #d7d9d8;
+  --done-bg: #f3f4f3;
+  --done-line: #e2e4e3;
+  --done-text: #969999;
+  --danger: #9d5551;
+  --shadow: 0 22px 62px rgba(28, 31, 30, 0.065);
+  --shadow-soft: 0 10px 30px rgba(28, 31, 30, 0.045);
+}
+
+html {
+  background: var(--bg);
+}
+
+body {
+  position: relative;
+  background: radial-gradient(circle at 8% 4%, #fff 0, transparent 28rem), linear-gradient(180deg, #f9f9f8 0%, #f3f4f3 100%);
+  font-family: "Segoe UI Variable Text", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body::before {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background: url("data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUEBAUEAwUFBAUGBgUGCA4JCAcHCBEMDQoOFBEVFBMRExMWGB8bFhceFxMTGyUcHiAhIyMjFRomKSYiKR8iIyL/2wBDAQYGBggHCBAJCRAiFhMWIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiL/wAARCAPAAhwDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD7KooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKbRQA6im0UAOoptFADqKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKbTqbQAUUUUAFFFFABRRRQA6iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACm06m0AOooooAKKKKACiiigAooooAKKbRQA6iiigAooooAKKKKADNGaTNGaAFooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAG0UUUAFFFFABRRRQAUUUUAOooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACim0UAOptFFAC0UlFABRRRQAtFJRQAZ96M+9FFABRRRQAUUUUALRSUUALRSUUAFFFFABRRRQAtFJRQAtFJRQAZ96M+9FFAC5HqKMj1FJRQAuR6ijI9RSUUALkeooyPUUlFAC5HqKMj1pKKAHUUUUAFFFFABTadTaACiiigAooooAKKKKACiiigAooooAUGlptKDQAtFNooAdRTaKAHUU2igAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAFopKKAFpKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKZk0ZNABg0YNGTRQA4HilpoPNOoAKKKBQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUuKMUAJRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAMooooAKKKKACng5FRiloAdkUuaZRQA+iiigAooooAKKMijIoAKKMijIoAKKMijIoAKKMijIoAKQmlPAplADgfWlplG40APyKMimUUAPyKMimUUAFFFFABRRRQA/IoyKZRQA/IoyKZRQA/IoyKZRQA/IoyKZRQA+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigBlFFFACE0A0EUAUALRRRQAgpaQUtABRRQODQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUYoAKQmg0YoAWiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAH0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUzJoyaAH0UzJoyaACiiigAooooAKKbRQAUUUUAFLmkFFAC5pabRQAuaSilxQAlLmjFJQAuaM0lFAC5ozSUUALmjNJRQAuaM0lFADqKbS5oAWikzRmgBaKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigB+RRkUyigB9FFFABRRRQAUUzJoyaAH0UUUAFMPWn0w9aACiiigAooooAKKKKACiiigAptOptABRRRQAUUUUAHeik70tAB3oFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFADqKQGloAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKbRQAUUUUAFFFFABRRRQAg60tIOtL3oAKKKKACiiigAooooAKKKKACiiigAopM0ZoAWikzRmgBaKSjNAC0UmaXNABRRRQAUUUUAOopM0ZoAWikzRmgBaKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACim0UAOoptFABRRRQAUUUUAFFFFABRRRQAUUlFABSimiloAWikzRmgBaKM0ZoAKKM0ZoASiiigAoJoooAKKKKACg0fSloAbilpcUYoASiiigAFLSUtABSGlpKAFooooAKKKKACiiigAooooAKKKKAHUU2igB1FFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRmm0UALRSUUAFFFFABRRRQAUUUUAFFFFABRRRQAUnejNFAB2oopM0AFLRRQAUUUUAFFFFABRRRQAUUmeaWgAooooAKKSloAKM0UmaAFzRmm5ozQA6ikzRQAtANFFAATRRRQAUZoooAWigUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUYozSZoAWik3UbqAFooooAKKKKACiiigAzRmkooAKKKKACkpaTvQAdqSiigAp1Np1ABRRRQAUUmaM0ALRSZozQAZozSUUALmjNJRQAUUUUAFFFFABRRRQAUUUUALmkoFLigApRRSUALRRRQAUUUUAFFFFABRmikzQA6ikozQAtFFFABRRRQAUUUUAFFGaM0AFFGaM0AFFJmjNAC0UmaM0AFFFFABRRRQA2inYoxQAlLRRQAUUUUAFFJRmgBc0UmaM0AGaM0lFABRRRQAUU2igB1OptOoAKKKKAG0UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFADsUUUmaACkoooAXNFJRQA6iiigAooooAKTFLRigAooooAM0uaSigAzRmiigAzRmiigAooooAKKKKACikzRmgBaKTNGaADNGaSigBc0ZpKKAH5pM0maM0ALRTc0UAOpKSkNAC0U2igB1FJxRxQAtFJSUAGaWkWlIoASiiigB1FFFABRRRQAUUUUAFFJmigBaKbRQA6im0UAOooooAQ0lKaSgBaWmiigB2aKbRQA7NIaSigBRS0gpaACijNFABRRRQA6ikzRmgBaKTNGaAFooooAKKSjNAC0UUmaAFopM0lAC0lFFABRRRQAGkNLSUAApRSUtABRSZozQAtFJmjNAC0UUmaAFptFFAC5ozSUUALmjNJRQAUuaTNGaAFzSUZozQAufal3U2kJ9KACiiigB9FFFABRRRQAmaKSigAooooAKKKKACiiigAooooAKKKKACjNBNNLc0AOozSUhOKAHUUlLQAUUUUALS02nUAFFFIetAC0UUUAFFFFAC5ozSUUAFFFFABRR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TkUm2gCHb7Ubfap+fQUc+goAg2+1G2p+fQUc+goAg20banxRg4oAhC5p2yn4PcUhzQABakIBWmgU5QSaADHFPUUYp6igCQcCimru/i9T+VPoAbExePLDDDgipBTd373b3xmn0AKKUdaQUooAYgYO+45UnI9qkoooAfQelFB6UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQA1m2jmkprhnmX+6vP1p1ADaKdSUAMIpuKkptADKTGadTaAGFKTZT+c0uKACilooASilooAbijApaKAEwKNo9KWigBm32pNtSUUAR7fak2+1S0UAQ4HpRgVNx6UcelAEPFFTcelGB6UAVyKSpilNKe1AEeKXFSBKcE4oAhwaMGpvLpNn+cUARYNFS7KTbQBHn2o/CpPLoCUAR4pNvtU+yl2UAQhaeFx2qTaKTAoAMUtGKMc0ALS4oxThQAAYpcUAUtABTqSloAKVRzSgetL0oAKKKKACiiigAooooAKKKKACim5PpTqACiiigAooooAKKKKACiiigAooooAZRTsCk2+lADKKdikxQAwim4qSkIoAZiinYoxQAbaNtPxRigBm2jbT8UYoAZgUYFOxRigBuBRgU7FGKAGYpMU/FGKAI8UYqTb7Um32oAj2ijaKk20baAI9oo2ipNtG2gCOin49qT8DQAlFLz6Glx7GgBKSlxRigBtGKdijFADaKXFFACUYpaKACkwKXFKBQAgFOxSgUtABijFLRQAUUopcZoAKcB3pNtO6UAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUALSUUpFACUUUUAFFFFABRRRQAUUUUAFFFFABRiiigBmKXbTgc0UARkEUlS4zSbQaAFooooAKKKKAG7aTZT6KAGbKNlPooAZtNG00+igBm00bTT6KAI/wo/CpMCjAoAj/AAo/CpMCjAoAixRj2p+P84ox/nFADMe1GKfj/OKMf5xQBHijFP2n0o2n0oAZijFP2n0o2n0oAZgUYFO2n0NG0+hoAbgUYFO2n0NLtPoaAG8UVJt+tG360AR0VJt+tG360ANxRjmnYFGBQAYFGBRgUYFAC0UUUAFFFFABRTqKAG0U6igBtFOooAbRTqKAExRS0UAFFFFABRRRQAUUUUAFFFFABRRRQA2inUUANop1FADaKMUYoAKKMUYoAdRS0UAJRS0UANxRilxRigBMUYpcUYoAbijFOxRigBuKMU7FGKAG0U7FGKAG0U7FGKAG0U7FGKAG0U7FGKAG4FGBS4oxQAmBRgUuKMUAJgUYFLijFACYFGBS4oxQA38KPwp2KMUAN/Cj8KdijFACUU6igBtFOpCKADFGKWigBMUYpaKAEopaKAEopaKAEopaKAEopaKACilxSUAFFA60pFACUUtFACUUtFACUUtFACUUtFACUUUUAFFFFABRS4oxQAlFLijFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFACYpaKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA70UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAd6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAHSigdKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADvRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//ZEzYGAQAAAACn0/keefd3GVl+f+pA/Y+4") center 64% / cover no-repeat;
+  filter: grayscale(1) contrast(0.72) brightness(1.07);
+  opacity: 0.11;
+}
+
+button:focus-visible,
+input:focus-visible,
+.file-button:focus-within {
+  outline: 2px solid rgba(34, 36, 37, 0.28);
+}
+
+.page-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1140px, calc(100% - 48px));
+  padding-top: 34px;
+  padding-bottom: 42px;
+}
+
+.topbar {
+  margin-bottom: 27px;
+}
+
+.brand-mark {
+  border: 1px solid #1f2122;
+  border-radius: 15px;
+  color: #fff;
+  background: #252728;
+  box-shadow: 0 10px 24px rgba(25, 27, 28, 0.14);
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.brand strong {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.brand small,
+.page-footer {
+  color: #8d9090;
+}
+
+.button {
+  font-weight: 620;
+}
+
+.button-primary {
+  color: #fff;
+  border-color: #292b2c;
+  background: #292b2c;
+  box-shadow: 0 9px 22px rgba(28, 30, 31, 0.13);
+}
+
+.button-primary:hover {
+  background: #151617;
+}
+
+.button-quiet {
+  color: #4d5051;
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 4px 14px rgba(28, 31, 30, 0.025);
+}
+
+.button-quiet:hover {
+  color: #222425;
+  border-color: var(--line-strong);
+  background: #fff;
+}
+
+.hero {
+  grid-template-columns: minmax(0, 1.5fr) minmax(285px, 0.72fr);
+  gap: 42px;
+  min-height: 244px;
+  padding: 44px 46px;
+  border-color: rgba(223, 225, 224, 0.9);
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.95) 56%, rgba(245, 246, 245, 0.91) 100%);
+  box-shadow: var(--shadow);
+}
+
+.hero::before {
+  width: 330px;
+  height: 330px;
+  top: -220px;
+  right: 12%;
+  background: radial-gradient(circle, rgba(32, 34, 35, 0.045), transparent 68%);
+}
+
+.hero::after {
+  width: auto;
+  height: 1px;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 0;
+  background: linear-gradient(90deg, transparent, rgba(32, 34, 35, 0.08), transparent);
+}
+
+.eyebrow {
+  color: #838686;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+}
+
+.hero h1,
+.panel-heading h2,
+.calendar-heading h2,
+.detail-heading h2,
+.modal-heading h2 {
+  font-family: "Segoe UI Variable Display", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  font-weight: 630;
+  letter-spacing: -0.04em;
+}
+
+.hero h1 {
+  font-size: clamp(31px, 4.2vw, 48px);
+}
+
+.today-date,
+.progress-card p,
+.detail-date,
+.empty-state,
+.page-footer,
+.form-message,
+.modal-message {
+  letter-spacing: 0.01em;
+}
+
+.progress-card {
+  padding: 24px;
+  border-color: rgba(226, 228, 227, 0.95);
+  background: rgba(255, 255, 255, 0.73);
+  box-shadow: 0 13px 38px rgba(28, 31, 30, 0.055);
+  backdrop-filter: blur(14px);
+}
+
+.progress-copy strong,
+.detail-summary strong {
+  color: #222425;
+  font-weight: 650;
+}
+
+.progress-track {
+  height: 9px;
+  background: #e9eae9;
+}
+
+.progress-track span {
+  background: linear-gradient(90deg, #3f4243, #858888);
+}
+
+.dashboard {
+  grid-template-columns: minmax(0, 1.06fr) minmax(350px, 0.94fr);
+  gap: 22px;
+}
+
+.panel {
+  border-color: rgba(225, 227, 226, 0.94);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px);
+}
+
+.today-panel,
+.calendar-panel,
+.detail-panel {
+  padding: 30px;
+}
+
+.summary-pill {
+  border: 1px solid #e4e5e4;
+  color: #4d5051;
+  background: #f7f8f7;
+  font-weight: 650;
+}
+
+.add-habit-form input,
+.modal-card input {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.add-habit-form input:focus,
+.modal-card input:focus {
+  border-color: #a9acab;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(39, 42, 43, 0.055);
+}
+
+.habit-row,
+.detail-row {
+  border-color: var(--line);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.habit-row:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 7px 18px rgba(28, 31, 30, 0.035);
+}
+
+.habit-check,
+.detail-check {
+  border-color: #cfd2d1;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.habit-toggle:hover .habit-check {
+  border-color: #858989;
+}
+
+.habit-row.is-completed {
+  border-color: var(--done-line);
+  background: var(--done-bg);
+}
+
+.habit-row.is-completed .habit-check,
+.detail-row.is-completed .detail-check {
+  border-color: #858988;
+  background: #858988;
+}
+
+.text-button:hover,
+.icon-button:hover {
+  color: #222425;
+  background: #f2f3f2;
+}
+
+.readonly-badge,
+.readonly-note {
+  border: 1px solid #e5e6e5;
+  color: #737676;
+  background: #f6f7f6;
+}
+
+.calendar-day {
+  color: #555858;
+  background: #fafafa;
+}
+
+.calendar-day:hover:not(:disabled) {
+  border-color: #d7d9d8;
+  box-shadow: 0 7px 17px rgba(28, 31, 30, 0.055);
+}
+
+.calendar-day.status-none {
+  background: #fafafa;
+}
+
+.calendar-day.status-partial {
+  color: #5e6160;
+  background: #eceeed;
+}
+
+.calendar-day.status-all {
+  color: #fff;
+  background: #484b4b;
+}
+
+.calendar-day.is-today {
+  box-shadow: inset 0 0 0 1px #9da09f;
+}
+
+.calendar-day.is-selected {
+  border-color: #373939;
+  box-shadow: inset 0 0 0 1px #373939, 0 6px 17px rgba(28, 31, 30, 0.1);
+}
+
+.calendar-day.is-future {
+  color: #c7c9c8;
+  background: #fcfcfc;
+}
+
+.calendar-day.is-future.is-today {
+  color: #555858;
+}
+
+.legend-none {
+  background: #e7e8e7;
+}
+
+.legend-partial {
+  background: #bfc1c0;
+}
+
+.legend-all {
+  background: #4b4e4e;
+}
+
+.empty-illustration span {
+  border: 1px solid #d5d7d6;
+  background: #e9eae9;
+}
+
+.empty-illustration span:nth-child(2) {
+  background: #7b7e7e;
+}
+
+.modal::backdrop {
+  background: rgba(28, 30, 30, 0.27);
+  backdrop-filter: blur(5px);
+}
+
+.modal-card {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+.toast {
+  background: rgba(30, 32, 32, 0.95);
+}
+
+.toast.is-error {
+  background: rgba(139, 69, 65, 0.96);
+}
+@media (max-width: 900px) {
+  .page-shell {
+    width: min(100% - 28px, 720px);
+    padding-top: 20px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 32px;
+  }
+
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .today-panel,
+  .calendar-panel {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-shell {
+    width: min(100% - 20px, 540px);
+    padding-bottom: 24px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+
+  .brand small {
+    display: none;
+  }
+
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .backup-actions {
+    gap: 6px;
+  }
+
+  .backup-actions .button {
+    min-height: 38px;
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+
+  .hero {
+    min-height: 0;
+    padding: 27px 22px;
+    border-radius: 23px;
+  }
+
+  .hero h1 {
+    font-size: 31px;
+  }
+
+  .progress-card {
+    padding: 19px;
+  }
+
+  .today-panel,
+  .calendar-panel,
+  .detail-panel {
+    padding: 21px 17px;
+    border-radius: 23px;
+  }
+
+  .add-habit-form {
+    grid-template-columns: 1fr;
+  }
+
+  .add-habit-form .button {
+    width: 100%;
+  }
+
+  .habit-row {
+    padding-left: 9px;
+  }
+
+  .text-button {
+    padding: 5px 6px;
+  }
+
+  .calendar-grid,
+  .calendar-weekdays {
+    gap: 3px;
+  }
+
+  .calendar-day {
+    min-height: 38px;
+    border-radius: 11px;
+  }
+
+  .detail-heading {
+    align-items: flex-start;
+  }
+
+  .detail-summary {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+  }
+
+  .detail-summary strong {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  .brand strong {
+    font-size: 16px;
+  }
+
+  .backup-actions .button {
+    padding-inline: 8px;
+  }
+
+  .habit-actions {
+    gap: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+
+
+</style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="习惯小站">
+        <span class="brand-mark" aria-hidden="true">✓</span>
+        <span>
+          <strong>习惯小站</strong>
+          <small>每天一点点，积累看得见</small>
+        </span>
+      </div>
+      <div class="backup-actions" aria-label="数据备份">
+        <button class="button button-quiet" id="exportButton" type="button">导出备份</button>
+        <label class="button button-quiet file-button" for="importInput">导入恢复</label>
+        <input id="importInput" type="file" accept="application/json,.json" hidden>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="todayHeading">
+        <div class="hero-copy">
+          <p class="eyebrow" id="todayLabel">今天</p>
+          <h1 id="todayHeading">把想坚持的事，轻轻打个勾。</h1>
+          <p class="today-date" id="todayDate"></p>
+        </div>
+        <div class="progress-card">
+          <div class="progress-copy">
+            <span>今日完成</span>
+            <strong id="progressCount">0 / 0</strong>
+          </div>
+          <div class="progress-track" id="todayProgress" role="progressbar" aria-label="今日完成进度" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+            <span id="progressFill"></span>
+          </div>
+          <p id="progressMessage">添加第一个习惯，开启今天的打卡。</p>
+        </div>
+      </section>
+
+      <div class="dashboard">
+        <section class="panel today-panel" aria-labelledby="habitListHeading">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">今日清单</p>
+              <h2 id="habitListHeading">要完成的事</h2>
+            </div>
+            <span class="summary-pill" id="todaySummary">0 / 0</span>
+          </div>
+
+          <form class="add-habit-form" id="addHabitForm" novalidate>
+            <label class="sr-only" for="newHabitInput">新习惯名称</label>
+            <input id="newHabitInput" name="habitName" type="text" maxlength="20" autocomplete="off" placeholder="例如：喝水、运动、读书" required>
+            <button class="button button-primary" type="submit">
+              <span aria-hidden="true">＋</span>
+              添加习惯
+            </button>
+          </form>
+          <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+
+          <div class="habit-list" id="todayHabitList"></div>
+          <div class="empty-state" id="todayEmptyState" hidden>
+            <div class="empty-illustration" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <h3>今天从一个小习惯开始</h3>
+            <p>在上方输入想坚持的事情，完成后点一下就能记下来。</p>
+          </div>
+        </section>
+
+        <section class="panel calendar-panel" aria-labelledby="calendarHeading">
+          <div class="calendar-heading">
+            <div>
+              <p class="eyebrow">打卡日历</p>
+              <h2 id="calendarHeading">回看每一天</h2>
+            </div>
+            <button class="button button-quiet button-small" id="todayButton" type="button">回到今天</button>
+          </div>
+
+          <div class="month-navigation">
+            <button class="icon-button" id="previousMonth" type="button" aria-label="上一个月">‹</button>
+            <strong id="monthTitle" aria-live="polite"></strong>
+            <button class="icon-button" id="nextMonth" type="button" aria-label="下一个月">›</button>
+          </div>
+
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="月历"></div>
+
+          <div class="calendar-legend" aria-label="日历图例">
+            <span><i class="legend-dot legend-none"></i>未完成</span>
+            <span><i class="legend-dot legend-partial"></i>完成一部分</span>
+            <span><i class="legend-dot legend-all"></i>全部完成</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel detail-panel" aria-labelledby="detailHeading">
+        <div class="detail-heading">
+          <div>
+            <p class="eyebrow" id="detailEyebrow">当天记录</p>
+            <h2 id="detailHeading">今天的完成情况</h2>
+            <p class="detail-date" id="detailDate"></p>
+          </div>
+          <div class="detail-summary">
+            <span class="readonly-badge" id="readonlyBadge" hidden>只读记录</span>
+            <strong id="detailCount">0 / 0</strong>
+          </div>
+        </div>
+        <p class="readonly-note" id="readonlyNote" hidden>为了保留真实记录，超过最近 7 天的日期只能查看。</p>
+        <div class="detail-list" id="detailList"></div>
+        <div class="empty-state empty-state-compact" id="detailEmptyState" hidden>
+          <h3>这一天还没有习惯记录</h3>
+          <p>之后添加的习惯会从添加当天开始出现在日历里。</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <p>数据只保存在当前浏览器中，请定期导出备份。</p>
+    </footer>
+  </div>
+
+  <dialog class="modal" id="editDialog" aria-labelledby="editDialogTitle">
+    <form class="modal-card" id="editHabitForm" novalidate>
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">习惯管理</p>
+          <h2 id="editDialogTitle">修改习惯名称</h2>
+        </div>
+        <button class="icon-button" id="closeEditDialog" type="button" aria-label="关闭">×</button>
+      </div>
+      <label for="editHabitInput">习惯名称</label>
+      <input id="editHabitInput" type="text" maxlength="20" autocomplete="off" required>
+      <p class="modal-message" id="editMessage" role="status" aria-live="polite"></p>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="cancelEdit" type="button">取消</button>
+        <button class="button button-primary" type="submit">保存修改</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="confirmDialog" aria-labelledby="confirmDialogTitle">
+    <form class="modal-card" id="confirmForm">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">请确认</p>
+          <h2 id="confirmDialogTitle">确认操作</h2>
+        </div>
+      </div>
+      <p class="confirm-message" id="confirmMessage"></p>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="cancelConfirm" type="button">取消</button>
+        <button class="button button-danger" id="confirmAction" type="submit">确认</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <script>
+﻿'use strict';
+
+const STORAGE_KEY = 'habit-tracker:v1';
+const STATE_VERSION = 1;
+const MAX_NAME_LENGTH = 20;
+const EDITABLE_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+let todayKey = getDateKey(new Date());
+let selectedDate = todayKey;
+let calendarMonth = getMonthStart(todayKey);
+let state = createEmptyState();
+let editingHabitId = null;
+let confirmResolver = null;
+let toastTimer = null;
+let loadWarning = '';
+let storageAvailable = true;
+
+const elements = {
+  todayLabel: document.querySelector('#todayLabel'),
+  todayDate: document.querySelector('#todayDate'),
+  progressCount: document.querySelector('#progressCount'),
+  todayProgress: document.querySelector('#todayProgress'),
+  progressFill: document.querySelector('#progressFill'),
+  progressMessage: document.querySelector('#progressMessage'),
+  todaySummary: document.querySelector('#todaySummary'),
+  addHabitForm: document.querySelector('#addHabitForm'),
+  newHabitInput: document.querySelector('#newHabitInput'),
+  formMessage: document.querySelector('#formMessage'),
+  todayHabitList: document.querySelector('#todayHabitList'),
+  todayEmptyState: document.querySelector('#todayEmptyState'),
+  exportButton: document.querySelector('#exportButton'),
+  importInput: document.querySelector('#importInput'),
+  previousMonth: document.querySelector('#previousMonth'),
+  nextMonth: document.querySelector('#nextMonth'),
+  todayButton: document.querySelector('#todayButton'),
+  monthTitle: document.querySelector('#monthTitle'),
+  calendarGrid: document.querySelector('#calendarGrid'),
+  detailEyebrow: document.querySelector('#detailEyebrow'),
+  detailHeading: document.querySelector('#detailHeading'),
+  detailDate: document.querySelector('#detailDate'),
+  detailCount: document.querySelector('#detailCount'),
+  readonlyBadge: document.querySelector('#readonlyBadge'),
+  readonlyNote: document.querySelector('#readonlyNote'),
+  detailList: document.querySelector('#detailList'),
+  detailEmptyState: document.querySelector('#detailEmptyState'),
+  editDialog: document.querySelector('#editDialog'),
+  editHabitForm: document.querySelector('#editHabitForm'),
+  editHabitInput: document.querySelector('#editHabitInput'),
+  editMessage: document.querySelector('#editMessage'),
+  closeEditDialog: document.querySelector('#closeEditDialog'),
+  cancelEdit: document.querySelector('#cancelEdit'),
+  confirmDialog: document.querySelector('#confirmDialog'),
+  confirmForm: document.querySelector('#confirmForm'),
+  confirmDialogTitle: document.querySelector('#confirmDialogTitle'),
+  confirmMessage: document.querySelector('#confirmMessage'),
+  confirmAction: document.querySelector('#confirmAction'),
+  cancelConfirm: document.querySelector('#cancelConfirm'),
+  toast: document.querySelector('#toast')
+};
+
+const longDateFormatter = new Intl.DateTimeFormat('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  weekday: 'long'
+});
+
+const shortDateFormatter = new Intl.DateTimeFormat('zh-CN', {
+  month: 'long',
+  day: 'numeric'
+});
+
+function createEmptyState() {
+  return {
+    version: STATE_VERSION,
+    habits: [],
+    completions: {}
+  };
+}
+
+function getDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function parseDateKey(dateKey) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateKey);
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(year, month - 1, day, 12);
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+  return date;
+}
+
+function isValidDateKey(dateKey) {
+  return typeof dateKey === 'string' && parseDateKey(dateKey) !== null;
+}
+
+function getMonthStart(dateKey) {
+  const date = parseDateKey(dateKey);
+  return getDateKey(new Date(date.getFullYear(), date.getMonth(), 1, 12));
+}
+
+function shiftMonth(dateKey, amount) {
+  const date = parseDateKey(dateKey);
+  return getDateKey(new Date(date.getFullYear(), date.getMonth() + amount, 1, 12));
+}
+
+function addDays(dateKey, amount) {
+  const date = parseDateKey(dateKey);
+  date.setDate(date.getDate() + amount);
+  return getDateKey(date);
+}
+
+function dayDifference(fromDateKey, toDateKey) {
+  const from = parseDateKey(fromDateKey);
+  const to = parseDateKey(toDateKey);
+  const fromUtc = Date.UTC(from.getFullYear(), from.getMonth(), from.getDate());
+  const toUtc = Date.UTC(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.round((toUtc - fromUtc) / DAY_MS);
+}
+
+function canEditDate(dateKey) {
+  return dateKey <= todayKey && dayDifference(dateKey, todayKey) < EDITABLE_DAYS;
+}
+
+function formatLongDate(dateKey) {
+  return longDateFormatter.format(parseDateKey(dateKey));
+}
+
+function formatShortDate(dateKey) {
+  return shortDateFormatter.format(parseDateKey(dateKey));
+}
+
+function createId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  return `habit-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function getActiveHabits(dateKey) {
+  return state.habits.filter((habit) => {
+    if (habit.createdDate > dateKey) {
+      return false;
+    }
+    return habit.archivedDate === null || dateKey < habit.archivedDate;
+  });
+}
+
+function getHabitName(habit, dateKey) {
+  if (!habit || !Array.isArray(habit.names) || habit.names.length === 0) {
+    return '未命名习惯';
+  }
+
+  const availableNames = habit.names
+    .filter((entry) => entry.effectiveDate <= dateKey)
+    .sort((a, b) => b.effectiveDate.localeCompare(a.effectiveDate));
+
+  return availableNames[0]?.name || habit.names[0].name;
+}
+
+function getCompletionIds(dateKey) {
+  return Array.isArray(state.completions[dateKey]) ? state.completions[dateKey] : [];
+}
+
+function isCompleted(dateKey, habitId) {
+  return getCompletionIds(dateKey).includes(habitId);
+}
+
+function getDayStats(dateKey) {
+  const habits = getActiveHabits(dateKey);
+  const completionIds = getCompletionIds(dateKey);
+  const completed = habits.reduce(
+    (count, habit) => count + (completionIds.includes(habit.id) ? 1 : 0),
+    0
+  );
+  return { habits, completed, total: habits.length };
+}
+
+function normalizeName(name) {
+  return String(name || '').trim();
+}
+
+function isDuplicateName(name, ignoredHabitId = null) {
+  const normalized = name.toLocaleLowerCase('zh-CN');
+  return getActiveHabits(todayKey).some((habit) => {
+    if (habit.id === ignoredHabitId) {
+      return false;
+    }
+    return getHabitName(habit, todayKey).toLocaleLowerCase('zh-CN') === normalized;
+  });
+}
+
+function validateState(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  if (value.version !== STATE_VERSION) {
+    return false;
+  }
+  if (!Array.isArray(value.habits) || !value.completions || typeof value.completions !== 'object' || Array.isArray(value.completions)) {
+    return false;
+  }
+
+  const habitIds = new Set();
+  for (const habit of value.habits) {
+    if (!habit || typeof habit !== 'object' || Array.isArray(habit)) {
+      return false;
+    }
+    if (typeof habit.id !== 'string' || habit.id.length === 0 || habitIds.has(habit.id)) {
+      return false;
+    }
+    if (!isValidDateKey(habit.createdDate)) {
+      return false;
+    }
+    if (habit.archivedDate !== null && (!isValidDateKey(habit.archivedDate) || habit.archivedDate < habit.createdDate)) {
+      return false;
+    }
+    if (!Array.isArray(habit.names) || habit.names.length === 0) {
+      return false;
+    }
+
+    for (const entry of habit.names) {
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+        return false;
+      }
+      const normalizedName = normalizeName(entry.name);
+      if (
+        !isValidDateKey(entry.effectiveDate) ||
+        entry.effectiveDate < habit.createdDate ||
+        normalizedName.length < 1 ||
+        normalizedName.length > MAX_NAME_LENGTH ||
+        normalizedName !== entry.name
+      ) {
+        return false;
+      }
+    }
+    habitIds.add(habit.id);
+  }
+
+  for (const [dateKey, completionIds] of Object.entries(value.completions)) {
+    if (!isValidDateKey(dateKey) || !Array.isArray(completionIds)) {
+      return false;
+    }
+    const seen = new Set();
+    for (const habitId of completionIds) {
+      if (typeof habitId !== 'string' || !habitIds.has(habitId) || seen.has(habitId)) {
+        return false;
+      }
+      seen.add(habitId);
+    }
+  }
+
+  return true;
+}
+
+function normalizeState(value) {
+  const normalized = {
+    version: STATE_VERSION,
+    habits: value.habits.map((habit) => ({
+      id: habit.id,
+      createdDate: habit.createdDate,
+      archivedDate: habit.archivedDate,
+      names: habit.names
+        .map((entry) => ({ effectiveDate: entry.effectiveDate, name: entry.name }))
+        .sort((a, b) => a.effectiveDate.localeCompare(b.effectiveDate))
+    })),
+    completions: {}
+  };
+
+  for (const [dateKey, completionIds] of Object.entries(value.completions)) {
+    normalized.completions[dateKey] = [...completionIds];
+  }
+
+  return normalized;
+}
+
+function loadState() {
+  try {
+    const rawState = localStorage.getItem(STORAGE_KEY);
+    if (!rawState) {
+      return createEmptyState();
+    }
+
+    const parsed = JSON.parse(rawState);
+    if (!validateState(parsed)) {
+      loadWarning = '本地数据格式异常，为保护原数据，页面未自动覆盖。';
+      return createEmptyState();
+    }
+    return normalizeState(parsed);
+  } catch (error) {
+    storageAvailable = false;
+    loadWarning = '无法读取浏览器本地存储，本次修改可能无法保存。';
+    return createEmptyState();
+  }
+}
+
+function persistState() {
+  if (!storageAvailable) {
+    showToast('浏览器本地存储不可用，修改未能保存。', true);
+    return false;
+  }
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  } catch (error) {
+    storageAvailable = false;
+    showToast('保存失败，可能是浏览器存储空间已满。', true);
+    return false;
+  }
+}
+
+function applyCompletedDayTone(row, completed) {
+  row.classList.toggle('is-completed', completed);
+}
+
+function makeCheckElement(className) {
+  const check = document.createElement('span');
+  check.className = className;
+  check.textContent = '✓';
+  check.setAttribute('aria-hidden', 'true');
+  return check;
+}
+
+function renderSummary(dateKey) {
+  const { completed, total } = getDayStats(dateKey);
+  const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+  const remaining = Math.max(total - completed, 0);
+
+  elements.progressCount.textContent = `${completed} / ${total}`;
+  elements.todaySummary.textContent = `${completed} / ${total}`;
+  elements.progressFill.style.width = `${percent}%`;
+  elements.todayProgress.setAttribute('aria-valuemax', String(total));
+  elements.todayProgress.setAttribute('aria-valuenow', String(completed));
+
+  if (total === 0) {
+    elements.progressMessage.textContent = '添加第一个习惯，开启今天的打卡。';
+  } else if (completed === total) {
+    elements.progressMessage.textContent = '今天全部完成，给自己一个小小的赞。';
+  } else {
+    elements.progressMessage.textContent = `已经完成 ${completed} 项，还差 ${remaining} 项。`;
+  }
+}
+
+function renderToday() {
+  const habits = getActiveHabits(todayKey);
+  const date = parseDateKey(todayKey);
+  const isActuallyToday = todayKey === getDateKey(new Date());
+
+  elements.todayLabel.textContent = isActuallyToday ? '今天' : '当前日期';
+  elements.todayDate.textContent = formatLongDate(todayKey);
+  elements.todayDate.dateTime = todayKey;
+  elements.todayDate.dataset.date = todayKey;
+  elements.todayDate.title = date.toLocaleDateString('zh-CN');
+  renderSummary(todayKey);
+
+  elements.todayHabitList.replaceChildren();
+  elements.todayHabitList.hidden = habits.length === 0;
+  elements.todayEmptyState.hidden = habits.length > 0;
+
+  for (const habit of habits) {
+    const completed = isCompleted(todayKey, habit.id);
+    const row = document.createElement('article');
+    row.className = 'habit-row';
+    applyCompletedDayTone(row, completed);
+
+    const toggle = document.createElement('button');
+    toggle.className = 'habit-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-pressed', String(completed));
+    toggle.setAttribute('aria-label', `${getHabitName(habit, todayKey)}，${completed ? '已完成，点击取消' : '未完成，点击打卡'}`);
+    toggle.append(makeCheckElement('habit-check'));
+
+    const name = document.createElement('span');
+    name.className = 'habit-name';
+    name.textContent = getHabitName(habit, todayKey);
+    toggle.append(name);
+    toggle.addEventListener('click', () => toggleHabit(todayKey, habit.id));
+
+    const actions = document.createElement('div');
+    actions.className = 'habit-actions';
+
+    const editButton = document.createElement('button');
+    editButton.className = 'text-button';
+    editButton.type = 'button';
+    editButton.textContent = '改名';
+    editButton.setAttribute('aria-label', `修改${getHabitName(habit, todayKey)}的名称`);
+    editButton.addEventListener('click', () => openEditDialog(habit.id));
+
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'text-button delete';
+    deleteButton.type = 'button';
+    deleteButton.textContent = '删除';
+    deleteButton.setAttribute('aria-label', `删除${getHabitName(habit, todayKey)}`);
+    deleteButton.addEventListener('click', () => requestDeleteHabit(habit.id));
+
+    actions.append(editButton, deleteButton);
+    row.append(toggle, actions);
+    elements.todayHabitList.append(row);
+  }
+}
+
+function renderCalendar() {
+  const monthDate = parseDateKey(calendarMonth);
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0, 12).getDate();
+  const firstWeekday = (new Date(year, month, 1, 12).getDay() + 6) % 7;
+
+  elements.monthTitle.textContent = `${year}年${month + 1}月`;
+  elements.calendarGrid.replaceChildren();
+
+  for (let index = 0; index < firstWeekday; index += 1) {
+    const blank = document.createElement('span');
+    blank.className = 'calendar-blank';
+    blank.setAttribute('aria-hidden', 'true');
+    elements.calendarGrid.append(blank);
+  }
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const dateKey = getDateKey(new Date(year, month, day, 12));
+    const { completed, total } = getDayStats(dateKey);
+    const isFuture = dateKey > todayKey;
+    const isToday = dateKey === todayKey;
+    const isSelected = dateKey === selectedDate;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'calendar-day';
+    button.dataset.date = dateKey;
+    button.disabled = isFuture;
+    button.setAttribute('role', 'gridcell');
+
+    if (completed > 0 && completed < total) {
+      button.classList.add('status-partial');
+    } else if (total > 0 && completed === total) {
+      button.classList.add('status-all');
+    } else {
+      button.classList.add('status-none');
+    }
+
+    button.classList.toggle('is-today', isToday);
+    button.classList.toggle('is-selected', isSelected);
+    button.classList.toggle('is-future', isFuture);
+
+    const number = document.createElement('span');
+    number.className = 'day-number';
+    number.textContent = String(day);
+    button.append(number);
+
+    if (completed > 0) {
+      const marker = document.createElement('span');
+      marker.className = 'day-marker';
+      marker.setAttribute('aria-hidden', 'true');
+      button.append(marker);
+    }
+
+    let stateLabel = '没有完成记录';
+    if (total > 0 && completed === total) {
+      stateLabel = `全部完成，${completed} 项`;
+    } else if (completed > 0) {
+      stateLabel = `完成 ${completed} / ${total} 项`;
+    } else if (total > 0) {
+      stateLabel = `未完成，共 ${total} 项`;
+    }
+    button.setAttribute('aria-label', `${formatShortDate(dateKey)}，${stateLabel}${isToday ? '，今天' : ''}`);
+    button.setAttribute('aria-selected', String(isSelected));
+    elements.calendarGrid.append(button);
+  }
+
+  const cellCount = firstWeekday + daysInMonth;
+  const trailingBlanks = (7 - (cellCount % 7)) % 7;
+  for (let index = 0; index < trailingBlanks; index += 1) {
+    const blank = document.createElement('span');
+    blank.className = 'calendar-blank';
+    blank.setAttribute('aria-hidden', 'true');
+    elements.calendarGrid.append(blank);
+  }
+}
+
+function renderDetail() {
+  const canEdit = canEditDate(selectedDate);
+  const isToday = selectedDate === todayKey;
+  const { habits, completed, total } = getDayStats(selectedDate);
+
+  elements.detailEyebrow.textContent = isToday ? '今日记录' : '历史记录';
+  elements.detailHeading.textContent = isToday ? '今天的完成情况' : `${formatShortDate(selectedDate)}的完成情况`;
+  elements.detailDate.textContent = formatLongDate(selectedDate);
+  elements.detailCount.textContent = `${completed} / ${total}`;
+  elements.readonlyBadge.hidden = canEdit;
+  elements.readonlyNote.hidden = canEdit;
+  elements.detailList.replaceChildren();
+  elements.detailList.hidden = habits.length === 0;
+  elements.detailEmptyState.hidden = habits.length > 0;
+
+  for (const habit of habits) {
+    const habitCompleted = isCompleted(selectedDate, habit.id);
+    const row = document.createElement(canEdit ? 'button' : 'div');
+    if (canEdit) {
+      row.type = 'button';
+      row.classList.add('detail-row-button');
+      row.setAttribute('aria-pressed', String(habitCompleted));
+      row.setAttribute('aria-label', `${getHabitName(habit, selectedDate)}，${habitCompleted ? '已完成，点击取消' : '未完成，点击完成'}`);
+      row.addEventListener('click', () => toggleHabit(selectedDate, habit.id));
+    }
+    row.className = `detail-row${canEdit ? ' detail-row-button' : ''}`;
+    applyCompletedDayTone(row, habitCompleted);
+    row.append(makeCheckElement('detail-check'));
+
+    const name = document.createElement('span');
+    name.className = 'detail-name';
+    name.textContent = getHabitName(habit, selectedDate);
+    row.append(name);
+
+    const status = document.createElement('span');
+    status.className = 'detail-state';
+    status.textContent = habitCompleted ? '已完成' : canEdit ? '点一下完成' : '未完成';
+    row.append(status);
+    elements.detailList.append(row);
+  }
+}
+
+function renderAll() {
+  syncTodayIfNeeded();
+  renderToday();
+  renderCalendar();
+  renderDetail();
+}
+
+function syncTodayIfNeeded() {
+  const currentToday = getDateKey(new Date());
+  if (currentToday === todayKey) {
+    return false;
+  }
+
+  const selectedWasToday = selectedDate === todayKey;
+  todayKey = currentToday;
+  if (selectedWasToday) {
+    selectedDate = todayKey;
+    calendarMonth = getMonthStart(todayKey);
+  }
+  return true;
+}
+
+function toggleHabit(dateKey, habitId) {
+  if (!canEditDate(dateKey)) {
+    return;
+  }
+
+  const completionIds = [...getCompletionIds(dateKey)];
+  const completionIndex = completionIds.indexOf(habitId);
+  if (completionIndex >= 0) {
+    completionIds.splice(completionIndex, 1);
+  } else {
+    completionIds.push(habitId);
+  }
+
+  if (completionIds.length === 0) {
+    delete state.completions[dateKey];
+  } else {
+    state.completions[dateKey] = completionIds;
+  }
+
+  persistState();
+  renderAll();
+}
+
+function addHabit(event) {
+  event.preventDefault();
+  const name = normalizeName(elements.newHabitInput.value);
+  elements.formMessage.textContent = '';
+
+  if (!name) {
+    elements.formMessage.textContent = '请输入习惯名称。';
+    elements.newHabitInput.focus();
+    return;
+  }
+  if (name.length > MAX_NAME_LENGTH) {
+    elements.formMessage.textContent = `习惯名称不能超过 ${MAX_NAME_LENGTH} 个字符。`;
+    elements.newHabitInput.focus();
+    return;
+  }
+  if (isDuplicateName(name)) {
+    elements.formMessage.textContent = '这个习惯已经在今天的清单里了。';
+    elements.newHabitInput.focus();
+    return;
+  }
+
+  state.habits.push({
+    id: createId(),
+    createdDate: todayKey,
+    archivedDate: null,
+    names: [{ effectiveDate: todayKey, name }]
+  });
+
+  persistState();
+  elements.newHabitInput.value = '';
+  elements.newHabitInput.focus();
+  renderAll();
+  showToast(`已添加“${name}”`);
+}
+
+function openEditDialog(habitId) {
+  const habit = state.habits.find((item) => item.id === habitId);
+  if (!habit) {
+    return;
+  }
+
+  editingHabitId = habitId;
+  elements.editHabitInput.value = getHabitName(habit, todayKey);
+  elements.editMessage.textContent = '';
+  elements.editDialog.showModal();
+  window.setTimeout(() => {
+    elements.editHabitInput.focus();
+    elements.editHabitInput.select();
+  }, 0);
+}
+
+function closeEditDialog() {
+  editingHabitId = null;
+  elements.editMessage.textContent = '';
+  if (elements.editDialog.open) {
+    elements.editDialog.close();
+  }
+}
+
+function saveEditedHabit(event) {
+  event.preventDefault();
+  const habit = state.habits.find((item) => item.id === editingHabitId);
+  if (!habit) {
+    closeEditDialog();
+    return;
+  }
+
+  const name = normalizeName(elements.editHabitInput.value);
+  elements.editMessage.textContent = '';
+  if (!name) {
+    elements.editMessage.textContent = '请输入习惯名称。';
+    elements.editHabitInput.focus();
+    return;
+  }
+  if (name.length > MAX_NAME_LENGTH) {
+    elements.editMessage.textContent = `习惯名称不能超过 ${MAX_NAME_LENGTH} 个字符。`;
+    elements.editHabitInput.focus();
+    return;
+  }
+  if (isDuplicateName(name, habit.id)) {
+    elements.editMessage.textContent = '这个名称已经被另一个习惯使用了。';
+    elements.editHabitInput.focus();
+    return;
+  }
+
+  const existingName = habit.names.find((entry) => entry.effectiveDate === todayKey);
+  if (existingName) {
+    existingName.name = name;
+  } else {
+    habit.names.push({ effectiveDate: todayKey, name });
+  }
+  habit.names.sort((a, b) => a.effectiveDate.localeCompare(b.effectiveDate));
+
+  persistState();
+  closeEditDialog();
+  renderAll();
+  showToast(`名称已改为“${name}”`);
+}
+
+async function requestDeleteHabit(habitId) {
+  const habit = state.habits.find((item) => item.id === habitId);
+  if (!habit) {
+    return;
+  }
+
+  const name = getHabitName(habit, todayKey);
+  const confirmed = await askForConfirmation({
+    title: `删除“${name}”？`,
+    message: '今天和之后将不再显示这个习惯。过去的打卡记录和当时的名称会继续保留。',
+    confirmLabel: '确认删除'
+  });
+
+  if (!confirmed) {
+    return;
+  }
+
+  habit.archivedDate = todayKey;
+  persistState();
+  renderAll();
+  showToast(`已删除“${name}”，历史记录仍保留`);
+}
+
+function askForConfirmation({ title, message, confirmLabel }) {
+  if (confirmResolver) {
+    resolveConfirmation(false);
+  }
+
+  elements.confirmDialogTitle.textContent = title;
+  elements.confirmMessage.textContent = message;
+  elements.confirmAction.textContent = confirmLabel;
+  elements.confirmDialog.showModal();
+
+  return new Promise((resolve) => {
+    confirmResolver = resolve;
+  });
+}
+
+function resolveConfirmation(result) {
+  const resolver = confirmResolver;
+  confirmResolver = null;
+  if (elements.confirmDialog.open) {
+    elements.confirmDialog.close();
+  }
+  if (resolver) {
+    resolver(result);
+  }
+}
+
+function exportData() {
+  const payload = {
+    ...state,
+    exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+  const downloadUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = `habit-tracker-backup-${todayKey}.json`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 0);
+  showToast('备份文件已导出');
+}
+
+async function importData(event) {
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  if (!file) {
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('备份文件过大，无法导入。', true);
+    return;
+  }
+
+  let importedState;
+  try {
+    importedState = JSON.parse(await file.text());
+  } catch (error) {
+    showToast('无法读取这个文件，请选择有效的 JSON 备份。', true);
+    return;
+  }
+
+  if (!validateState(importedState)) {
+    showToast('备份内容无效或版本不兼容，现有数据没有改变。', true);
+    return;
+  }
+
+  const confirmed = await askForConfirmation({
+    title: '确认导入备份？',
+    message: '导入会用备份内容完整替换当前浏览器中的习惯和历史记录，此操作无法撤销。',
+    confirmLabel: '确认导入'
+  });
+  if (!confirmed) {
+    return;
+  }
+
+  state = normalizeState(importedState);
+  selectedDate = todayKey;
+  calendarMonth = getMonthStart(todayKey);
+  persistState();
+  renderAll();
+  showToast('备份已导入，数据恢复完成');
+}
+
+function showToast(message, isError = false) {
+  window.clearTimeout(toastTimer);
+  elements.toast.textContent = message;
+  elements.toast.classList.toggle('is-error', isError);
+  elements.toast.hidden = false;
+  toastTimer = window.setTimeout(() => {
+    elements.toast.hidden = true;
+  }, isError ? 4200 : 2600);
+}
+
+function bindEvents() {
+  elements.addHabitForm.addEventListener('submit', addHabit);
+  elements.exportButton.addEventListener('click', exportData);
+  elements.importInput.addEventListener('change', importData);
+
+  elements.previousMonth.addEventListener('click', () => {
+    calendarMonth = shiftMonth(calendarMonth, -1);
+    renderCalendar();
+  });
+  elements.nextMonth.addEventListener('click', () => {
+    calendarMonth = shiftMonth(calendarMonth, 1);
+    renderCalendar();
+  });
+  elements.todayButton.addEventListener('click', () => {
+    syncTodayIfNeeded();
+    selectedDate = todayKey;
+    calendarMonth = getMonthStart(todayKey);
+    renderAll();
+  });
+
+  elements.calendarGrid.addEventListener('click', (event) => {
+    const dayButton = event.target.closest('.calendar-day');
+    if (!dayButton || dayButton.disabled) {
+      return;
+    }
+    selectedDate = dayButton.dataset.date;
+    renderCalendar();
+    renderDetail();
+  });
+
+  elements.editHabitForm.addEventListener('submit', saveEditedHabit);
+  elements.closeEditDialog.addEventListener('click', closeEditDialog);
+  elements.cancelEdit.addEventListener('click', closeEditDialog);
+  elements.editDialog.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    closeEditDialog();
+  });
+  elements.editDialog.addEventListener('close', () => {
+    editingHabitId = null;
+    elements.editMessage.textContent = '';
+  });
+
+  elements.confirmForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    resolveConfirmation(true);
+  });
+  elements.cancelConfirm.addEventListener('click', () => resolveConfirmation(false));
+  elements.confirmDialog.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    resolveConfirmation(false);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && syncTodayIfNeeded()) {
+      renderAll();
+    }
+  });
+  window.addEventListener('focus', () => {
+    if (syncTodayIfNeeded()) {
+      renderAll();
+    }
+  });
+
+  window.addEventListener('storage', (event) => {
+    if (event.key !== STORAGE_KEY || !event.newValue) {
+      return;
+    }
+    try {
+      const nextState = JSON.parse(event.newValue);
+      if (validateState(nextState)) {
+        state = normalizeState(nextState);
+        renderAll();
+      }
+    } catch (error) {
+      // Another tab may be mid-write; keep the current view.
+    }
+  });
+}
+
+function init() {
+  const loadedState = loadState();
+  state = loadedState;
+  bindEvents();
+  renderAll();
+
+  if (loadWarning) {
+    showToast(loadWarning, true);
+  }
+  if (!loadWarning && loadedState.habits.length === 0) {
+    window.setTimeout(() => elements.newHabitInput.focus(), 150);
+  }
+}
+
+init();
+
+
+  </script>
+</body>
+</html>
+
