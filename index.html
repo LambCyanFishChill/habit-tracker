@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f7f7f5">
+  <meta name="description" content="一个简单、好看的习惯打卡工具。">
+  <title>习惯小站 · 每日打卡</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="习惯小站">
+        <span class="brand-mark" aria-hidden="true">✓</span>
+        <span>
+          <strong>习惯小站</strong>
+          <small>每天一点点，积累看得见</small>
+        </span>
+      </div>
+      <div class="backup-actions" aria-label="数据备份">
+        <button class="button button-quiet" id="exportButton" type="button">导出备份</button>
+        <label class="button button-quiet file-button" for="importInput">导入恢复</label>
+        <input id="importInput" type="file" accept="application/json,.json" hidden>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="todayHeading">
+        <div class="hero-copy">
+          <p class="eyebrow" id="todayLabel">今天</p>
+          <h1 id="todayHeading">把想坚持的事，轻轻打个勾。</h1>
+          <p class="today-date" id="todayDate"></p>
+        </div>
+        <div class="progress-card">
+          <div class="progress-copy">
+            <span>今日完成</span>
+            <strong id="progressCount">0 / 0</strong>
+          </div>
+          <div class="progress-track" id="todayProgress" role="progressbar" aria-label="今日完成进度" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+            <span id="progressFill"></span>
+          </div>
+          <p id="progressMessage">添加第一个习惯，开启今天的打卡。</p>
+        </div>
+      </section>
+
+      <div class="dashboard">
+        <section class="panel today-panel" aria-labelledby="habitListHeading">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">今日清单</p>
+              <h2 id="habitListHeading">要完成的事</h2>
+            </div>
+            <span class="summary-pill" id="todaySummary">0 / 0</span>
+          </div>
+
+          <form class="add-habit-form" id="addHabitForm" novalidate>
+            <label class="sr-only" for="newHabitInput">新习惯名称</label>
+            <input id="newHabitInput" name="habitName" type="text" maxlength="20" autocomplete="off" placeholder="例如：喝水、运动、读书" required>
+            <button class="button button-primary" type="submit">
+              <span aria-hidden="true">＋</span>
+              添加习惯
+            </button>
+          </form>
+          <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+
+          <div class="habit-list" id="todayHabitList"></div>
+          <div class="empty-state" id="todayEmptyState" hidden>
+            <div class="empty-illustration" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <h3>今天从一个小习惯开始</h3>
+            <p>在上方输入想坚持的事情，完成后点一下就能记下来。</p>
+          </div>
+        </section>
+
+        <section class="panel calendar-panel" aria-labelledby="calendarHeading">
+          <div class="calendar-heading">
+            <div>
+              <p class="eyebrow">打卡日历</p>
+              <h2 id="calendarHeading">回看每一天</h2>
+            </div>
+            <button class="button button-quiet button-small" id="todayButton" type="button">回到今天</button>
+          </div>
+
+          <div class="month-navigation">
+            <button class="icon-button" id="previousMonth" type="button" aria-label="上一个月">‹</button>
+            <strong id="monthTitle" aria-live="polite"></strong>
+            <button class="icon-button" id="nextMonth" type="button" aria-label="下一个月">›</button>
+          </div>
+
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+          </div>
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="月历"></div>
+
+          <div class="calendar-legend" aria-label="日历图例">
+            <span><i class="legend-dot legend-none"></i>未完成</span>
+            <span><i class="legend-dot legend-partial"></i>完成一部分</span>
+            <span><i class="legend-dot legend-all"></i>全部完成</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel detail-panel" aria-labelledby="detailHeading">
+        <div class="detail-heading">
+          <div>
+            <p class="eyebrow" id="detailEyebrow">当天记录</p>
+            <h2 id="detailHeading">今天的完成情况</h2>
+            <p class="detail-date" id="detailDate"></p>
+          </div>
+          <div class="detail-summary">
+            <span class="readonly-badge" id="readonlyBadge" hidden>只读记录</span>
+            <strong id="detailCount">0 / 0</strong>
+          </div>
+        </div>
+        <p class="readonly-note" id="readonlyNote" hidden>为了保留真实记录，超过最近 7 天的日期只能查看。</p>
+        <div class="detail-list" id="detailList"></div>
+        <div class="empty-state empty-state-compact" id="detailEmptyState" hidden>
+          <h3>这一天还没有习惯记录</h3>
+          <p>之后添加的习惯会从添加当天开始出现在日历里。</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <p>数据只保存在当前浏览器中，请定期导出备份。</p>
+    </footer>
+  </div>
+
+  <dialog class="modal" id="editDialog" aria-labelledby="editDialogTitle">
+    <form class="modal-card" id="editHabitForm" novalidate>
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">习惯管理</p>
+          <h2 id="editDialogTitle">修改习惯名称</h2>
+        </div>
+        <button class="icon-button" id="closeEditDialog" type="button" aria-label="关闭">×</button>
+      </div>
+      <label for="editHabitInput">习惯名称</label>
+      <input id="editHabitInput" type="text" maxlength="20" autocomplete="off" required>
+      <p class="modal-message" id="editMessage" role="status" aria-live="polite"></p>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="cancelEdit" type="button">取消</button>
+        <button class="button button-primary" type="submit">保存修改</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="confirmDialog" aria-labelledby="confirmDialogTitle">
+    <form class="modal-card" id="confirmForm">
+      <div class="modal-heading">
+        <div>
+          <p class="eyebrow">请确认</p>
+          <h2 id="confirmDialogTitle">确认操作</h2>
+        </div>
+      </div>
+      <p class="confirm-message" id="confirmMessage"></p>
+      <div class="modal-actions">
+        <button class="button button-quiet" id="cancelConfirm" type="button">取消</button>
+        <button class="button button-danger" id="confirmAction" type="submit">确认</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
+
